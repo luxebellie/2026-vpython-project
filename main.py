@@ -39,26 +39,77 @@ countries = [("AFGHANISTAN", 33.94, 67.71),("ALBANIA", 41.15, 20.17),("ALGERIA",
              ("URUGUAY", -32.52, -55.77),("UZBEKISTAN", 41.38, 64.59),("VANUATU", -15.38, 166.96),("VATICAN CITY", 41.90, 12.45),("VENEZUELA", 6.42, -66.59),("VIETNAM", 14.06, 108.28),
              ("YEMEN", 15.55, 48.52),("ZAMBIA", -13.13, 27.85),("ZIMBABWE", -19.02, 29.15)]
 
-labels = []
+for name,lat,lon in countries:
+    pos = get_position(lat,lon)
+    country_label = label(pos=pos,text=name,color=color.white,height=8,box=False,opacity=0)
+    marker = box(pos=pos,size=vec(len(name),1,1),color=color.white,opacity=0.1)
+    labels.append((country_label,pos,marker,name))
+
 
 def country_clicked(evt):
+    global selected_country
     picked = scene.mouse.pick
 
-    for country_label, pos, marker, name in labels:
+    for country_label,pos,marker,name in labels:
         if picked == marker:
-            scene.caption = name + " 선택!"
+            selected_country = name
+            scene.caption = name+" 선택!"
 
-for name, lat, lon in countries:
-    pos = get_position(lat, lon)
-    country_label = label(pos=pos,text=name,color=color.white,height=8,box=False,opacity=0)
-    marker = box(pos=pos,size=vec(len(name)*1, 1, 1),color=color.white,opacity=0.1)
+scene.bind("click",country_clicked)
 
-    labels.append((country_label, pos, marker, name))
-
-scene.bind("click", country_clicked)
-    
 while True:
     rate(60)
-    view_dir = norm(scene.camera.pos - earth.pos)
-    for country_label, pos in labels:
-        country_label.visible = dot(norm(pos), view_dir) > 0
+    view_dir = norm(scene.camera.pos-earth.pos)
+
+    for country_label,pos,marker,name in labels:
+        front = dot(norm(pos),view_dir)>0
+        country_label.visible = front
+        marker.visible = front
+
+    show_bigben = selected_country == "UNITED KINGDOM" and dot(bigben_up,view_dir)>0
+    for obj in [b1,b2,b3,b4,b5,b6,clock1,clock2,hour_hand,minute_hand,clock_center]:
+        obj.visible = show_bigben
+    for obj in bigben_dots:
+        obj.visible = show_bigben
+    for obj in [number12,number3,number6,number9,bigben_name]:
+        obj.visible = show_bigben
+
+    show_empire = selected_country == "UNITED STATES" and dot(empire_up,view_dir)>0
+    for obj in [e1,e2,e3,e4,e5,e6,e7]:
+        obj.visible = show_empire
+    empire_name.visible = show_empire
+
+    show_tokyo = selected_country == "JAPAN" and dot(tokyo_up,view_dir)>0
+    for obj in tokyo_parts:
+        obj.visible = show_tokyo
+    tokyo_name.visible = show_tokyo
+
+    show_liberty = selected_country == "UNITED STATES" and dot(liberty_up,view_dir)>0
+    for obj in liberty_parts:
+        obj.visible = show_liberty
+    liberty_name.visible = show_liberty
+
+    show_korea = selected_country == "SOUTH KOREA" and dot(korea_up,view_dir)>0
+    for obj in korea_parts:
+        obj.visible = show_korea
+    korea_name.visible = show_korea
+
+    show_china = selected_country == "CHINA" and dot(china_up,view_dir)>0
+    for obj in china_parts:
+        obj.visible = show_china
+    china_name.visible = show_china
+
+    show_russia = selected_country == "RUSSIA" and dot(russia_up,view_dir)>0
+    for obj in russia_parts:
+        obj.visible = show_russia
+    russia_name.visible = show_russia
+
+    show_sky = selected_country == "NEW ZEALAND" and dot(sky_up,view_dir)>0
+    for obj in sky_parts:
+        obj.visible = show_sky
+    sky_name.visible = show_sky
+
+    show_eiffel = selected_country == "FRANCE" and dot(eiffel_up,view_dir)>0
+    for obj in eiffel_parts:
+        obj.visible = show_eiffel
+    eiffel_name.visible = show_eiffel
